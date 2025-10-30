@@ -18,12 +18,17 @@ class MovieViewModel{
     }
     
     private(set) var homeStatus: FetchStatus = .notStarted
+    private(set) var videoIdStatus:FetchStatus = .notStarted
+    
     private let dataFetcher = DataFetcher()
     
     var trendingMovies: [MovieModel] = []
     var trendingTV: [MovieModel] = []
     var topRatedMovies: [MovieModel] = []
     var topRatedTV: [MovieModel] = []
+    var videoId:String = ""
+    
+    var heroMovie:MovieModel = MovieModel.previewMovies[0]
     
     func getMoviesAndTvs() async{
         homeStatus = .fetching
@@ -39,6 +44,9 @@ class MovieViewModel{
                 trendingTV = try await tTV
                 topRatedMovies = try await tRMovies
                 topRatedTV = try await tRTV
+                if let randomMovie = trendingMovies.randomElement(){
+                    heroMovie = randomMovie
+                }
                 homeStatus = .success
             }catch{
                 print(error)
@@ -46,6 +54,18 @@ class MovieViewModel{
             }
         }else{
             homeStatus = .success
+        }
+    }
+    
+    func getVideoId(for movie:String) async {
+        videoIdStatus = .fetching
+        
+        do{
+            videoId = try await dataFetcher.fetchVideoId(for: movie)
+            videoIdStatus = .success
+        }catch{
+            print(error)
+            videoIdStatus = .failed(underlyingError: error)
         }
     }
 }

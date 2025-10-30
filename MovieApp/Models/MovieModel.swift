@@ -8,11 +8,11 @@
 import Foundation
 
 
-struct APIObject:Decodable{
+struct TMDBAPIObject:Decodable{
     var results: [MovieModel] = []
 }
 
-struct MovieModel: Decodable, Identifiable{
+struct MovieModel: Decodable, Identifiable, Hashable{
     var id:Int?
     var title:String?
     var name:String?

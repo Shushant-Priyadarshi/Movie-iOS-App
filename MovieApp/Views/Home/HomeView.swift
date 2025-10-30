@@ -8,73 +8,87 @@
 import SwiftUI
 
 struct HomeView: View {
-    var heroTestTitle = Constants.testTitleURL
     var movieViewModel = MovieViewModel()
+    @State private var movieDetailPath = NavigationPath()
     
     var body: some View {
-        GeometryReader { geo in
-            ScrollView {
-            switch movieViewModel.homeStatus{
-            case .notStarted:
-                EmptyView()
-            case .fetching:
-                ProgressView()
-                    .frame(width: geo.size.width, height: geo.size.height)
-                
-            case .success:
-                LazyVStack{
-                    AsyncImage(url: URL(string: heroTestTitle)){ image in
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .overlay {
-                                LinearGradient(
-                                 stops: [
-                                    Gradient.Stop(color: .clear, location: 0.8),
-                                    Gradient.Stop(color: .gradient, location:1)
-                                 ],
-                                 startPoint: .top,
-                                endPoint: .bottom
-                                )
-                            }
-                    } placeholder: {
+        NavigationStack(path: $movieDetailPath) {
+            GeometryReader { geo in
+                ScrollView {
+                    switch movieViewModel.homeStatus{
+                    case .notStarted:
+                        EmptyView()
+                    case .fetching:
                         ProgressView()
-                    }
-                    .frame(width: geo.size.width , height: geo.size.height * 0.85)
-                    
-                    HStack{
-                        Button{
-                            
-                        }label: {
-                            Text(Constants.playString)
-                                .myBtnStyle()
-                            
-                        }
+                            .frame(width: geo.size.width, height: geo.size.height)
                         
-                        
-                        Button{
+                    case .success:
+                        LazyVStack{
+                            AsyncImage(url: URL(string: movieViewModel.heroMovie.posterPath ?? "")){ image in
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .overlay {
+                                        LinearGradient(
+                                            stops: [
+                                                Gradient.Stop(color: .clear, location: 0.8),
+                                                Gradient.Stop(color: .gradient, location:1)
+                                            ],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    }
+                            } placeholder: {
+                                ProgressView()
+                            }
+                            .frame(width: geo.size.width , height: geo.size.height * 0.85)
                             
-                        }label: {
-                            Text(Constants.downloadsString)
-                                .myBtnStyle()
+                            HStack{
+                                Button{
+                                    movieDetailPath.append(movieViewModel.heroMovie)
+                                }label: {
+                                    Text(Constants.playString)
+                                        .myBtnStyle()
+                                    
+                                }
+                                
+                                
+                                Button{
+                                    
+                                }label: {
+                                    Text(Constants.downloadsString)
+                                        .myBtnStyle()
+                                }
+                            }
+                            
+                            HorizontalListView(header: Constants.trendingMoviesString, titles: movieViewModel.trendingMovies){ title in
+                                movieDetailPath.append(title)
+                            }
+                            HorizontalListView(header: Constants.trendingTVString,titles: movieViewModel.trendingTV){ title in
+                                movieDetailPath.append(title)
+                            }
+                            HorizontalListView(header: Constants.topRatedMovieString,titles: movieViewModel.topRatedMovies){ title in
+                                movieDetailPath.append(title)
+                            }
+                            HorizontalListView(header: Constants.topRatedTVString,titles: movieViewModel.topRatedTV){ title in
+                                movieDetailPath.append(title)
+                            }
                         }
+                       
+                        
+                    case .failed(let error):
+                        Text("Error \(error.localizedDescription)")
+                        
                     }
                     
-                    HorizontalListView(header: Constants.trendingMoviesString, titles: movieViewModel.trendingMovies)
-                    HorizontalListView(header: Constants.trendingTVString,titles: movieViewModel.trendingTV)
-                    HorizontalListView(header: Constants.topRatedMovieString,titles: movieViewModel.topRatedMovies)
-                    HorizontalListView(header: Constants.topRatedTVString,titles: movieViewModel.topRatedTV)
+                    
                 }
-                
-            case .failed(let error):
-                Text("Error \(error.localizedDescription)")
-            
-            }
-          
- 
-            }
-            .task {
-                await movieViewModel.getMoviesAndTvs()
+                .task {
+                    await movieViewModel.getMoviesAndTvs()
+                }
+                .navigationDestination(for: MovieModel.self) { movie in
+                    MovieDetailView(MovieDetailData: movie)
+                }
             }
         }
     }

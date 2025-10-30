@@ -11,6 +11,7 @@ struct HorizontalListView: View {
     
     let header:String
     var titles:[MovieModel]
+    let onSelect: (MovieModel) -> Void
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -29,6 +30,9 @@ struct HorizontalListView: View {
                             ProgressView()
                         }
                         .frame(width: 120,height: 200)
+                        .onTapGesture {
+                            onSelect(title)
+                        }
                             
                     }
                 }
@@ -40,5 +44,7 @@ struct HorizontalListView: View {
 }
 
 #Preview {
-    HorizontalListView(header: Constants.trendingMoviesString, titles: MovieModel.previewMovies)
+    HorizontalListView(header: Constants.trendingMoviesString, titles: MovieModel.previewMovies){title in
+        
+    }
 }
