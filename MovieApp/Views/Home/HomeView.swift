@@ -9,10 +9,19 @@ import SwiftUI
 
 struct HomeView: View {
     var heroTestTitle = Constants.testTitleURL
+    var movieViewModel = MovieViewModel()
     
     var body: some View {
         GeometryReader { geo in
             ScrollView {
+            switch movieViewModel.homeStatus{
+            case .notStarted:
+                EmptyView()
+            case .fetching:
+                ProgressView()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                
+            case .success:
                 LazyVStack{
                     AsyncImage(url: URL(string: heroTestTitle)){ image in
                         image
@@ -51,11 +60,21 @@ struct HomeView: View {
                         }
                     }
                     
-                    HorizontalListView(header: Constants.trendingMoviesString)
-                    HorizontalListView(header: Constants.trendingTVString)
-                    HorizontalListView(header: Constants.trendingMoviesString)
-                    HorizontalListView(header: Constants.topRatedTVString)
+                    HorizontalListView(header: Constants.trendingMoviesString, titles: movieViewModel.trendingMovies)
+                    HorizontalListView(header: Constants.trendingTVString,titles: movieViewModel.trendingTV)
+                    HorizontalListView(header: Constants.topRatedMovieString,titles: movieViewModel.topRatedMovies)
+                    HorizontalListView(header: Constants.topRatedTVString,titles: movieViewModel.topRatedTV)
                 }
+                
+            case .failed(let error):
+                Text("Error \(error.localizedDescription)")
+            
+            }
+          
+ 
+            }
+            .task {
+                await movieViewModel.getMoviesAndTvs()
             }
         }
     }

@@ -21,16 +21,31 @@ class MovieViewModel{
     private let dataFetcher = DataFetcher()
     
     var trendingMovies: [MovieModel] = []
+    var trendingTV: [MovieModel] = []
+    var topRatedMovies: [MovieModel] = []
+    var topRatedTV: [MovieModel] = []
     
-    func getTredingMovies() async{
+    func getMoviesAndTvs() async{
         homeStatus = .fetching
         
-        do{
-            trendingMovies = try await dataFetcher.fetchMovies(for: "movie")
+        if trendingMovies.isEmpty{
+            do{
+                async let tMovies =  dataFetcher.fetchMovies(for: "movie",by: "trending")
+                async let tTV = dataFetcher.fetchMovies(for: "tv", by: "trending")
+                async let tRMovies = dataFetcher.fetchMovies(for: "movie", by: "top_rated")
+                async let tRTV = dataFetcher.fetchMovies(for: "tv", by: "top_rated")
+                
+                trendingMovies = try await tMovies
+                trendingTV = try await tTV
+                topRatedMovies = try await tRMovies
+                topRatedTV = try await tRTV
+                homeStatus = .success
+            }catch{
+                print(error)
+                homeStatus = .failed(underlyingError: error)
+            }
+        }else{
             homeStatus = .success
-        }catch{
-            print(error)
-            homeStatus = .failed(underlyingError: error)
         }
     }
 }

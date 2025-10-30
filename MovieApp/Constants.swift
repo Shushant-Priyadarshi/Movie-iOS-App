@@ -28,6 +28,16 @@ struct Constants{
     static let testTitleURL = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
     static let testTitleURL2 = "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg"
     static let testTitleURL3 = "https://image.tmdb.org/t/p/w500/nnl6OWkyPpuMm595hmAxNW3rZFn.jpg"
+    
+    static let postPathStart = "https://image.tmdb.org/t/p/w500"
+    
+    static func addPostPath(to movies: inout[MovieModel]){
+        for index in movies.indices{
+            if let path = movies[index].posterPath {
+                movies[index].posterPath = Constants.postPathStart + path
+            }
+        }
+    }
 }
 
 
