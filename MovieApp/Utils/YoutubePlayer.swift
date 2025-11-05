@@ -3,7 +3,6 @@
 //  MovieApp
 //
 //  Created by Shushant  on 30/10/25.
-//
 
 import SwiftUI
 import WebKit
@@ -22,8 +21,14 @@ struct YoutubePlayer: UIViewRepresentable{ //let us use uikit using swiftui
               let baseURL = URL(string: baseURLString) else{    //conert the string -> URL
             return
         }
-        let fullURL = baseURL.appending(path: videoId)
-        webView.load(URLRequest(url: fullURL))
+        let bundleId = Bundle.main.bundleIdentifier ?? "com.movieapp"
+        let referer = "https://\(bundleId)"
+        
+        let fullURL = baseURL.appendingPathComponent(videoId)
+        
+        var request = URLRequest(url: fullURL)
+        request.setValue(referer, forHTTPHeaderField: "Referer")
+        webView.load(request)
     }
     
 }

@@ -64,6 +64,7 @@ struct DataFetcher{
     }
     
     
+    //fetch trailer of the movie provided
     func fetchVideoId(for movie:String) async throws -> String {
         guard let baseSearchURL  = youtubeSearchURL else{
             throw NetworkError.missingConfig
@@ -73,7 +74,7 @@ struct DataFetcher{
             throw NetworkError.missingConfig
         }
         
-        let trailerSearch = movie + YoutubeURLStrings.space.rawValue + YoutubeURLStrings.trailer.rawValue
+        let trailerSearch = movie + YoutubeURLStrings.space.rawValue + YoutubeURLStrings.trailer.rawValue 
         
         guard let fetchVideoURL = URL(string: baseSearchURL)?.appending(queryItems: [
             URLQueryItem(name: YoutubeURLStrings.queryShorten.rawValue, value: trailerSearch),
