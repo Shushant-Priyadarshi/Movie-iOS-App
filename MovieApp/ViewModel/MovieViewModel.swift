@@ -19,6 +19,7 @@ class MovieViewModel{
     
     private(set) var homeStatus: FetchStatus = .notStarted
     private(set) var videoIdStatus:FetchStatus = .notStarted
+    private(set) var upcomingStatus:FetchStatus = .notStarted
     
     private let dataFetcher = DataFetcher()
     
@@ -26,10 +27,12 @@ class MovieViewModel{
     var trendingTV: [MovieModel] = []
     var topRatedMovies: [MovieModel] = []
     var topRatedTV: [MovieModel] = []
+    var upcomingMovies: [MovieModel] = []
     var videoId:String = ""
     
     var heroMovie:MovieModel = MovieModel.previewMovies[0]
     
+    //function to get all the movies and tv in home screen
     func getMoviesAndTvs() async{
         homeStatus = .fetching
         
@@ -39,7 +42,7 @@ class MovieViewModel{
                 async let tTV = dataFetcher.fetchMovies(for: "tv", by: "trending")
                 async let tRMovies = dataFetcher.fetchMovies(for: "movie", by: "top_rated")
                 async let tRTV = dataFetcher.fetchMovies(for: "tv", by: "top_rated")
-                
+            
                 trendingMovies = try await tMovies
                 trendingTV = try await tTV
                 topRatedMovies = try await tRMovies
@@ -57,6 +60,7 @@ class MovieViewModel{
         }
     }
     
+    //function to get the video id from youtube
     func getVideoId(for movie:String) async {
         videoIdStatus = .fetching
         
@@ -67,5 +71,22 @@ class MovieViewModel{
             print(error)
             videoIdStatus = .failed(underlyingError: error)
         }
+    }
+    
+    //function to get all the movies for upcoming tab
+    func getUpcomingMovies() async{
+        upcomingStatus = .fetching
+        if upcomingMovies.isEmpty{
+            do{
+                upcomingMovies = try await dataFetcher.fetchMovies(for: "movie", by: "upcoming")
+                upcomingStatus = .success
+            }catch{
+                print(error)
+                upcomingStatus = .failed(underlyingError: error)
+            }
+        }else{
+            upcomingStatus = .success
+        }
+        
     }
 }

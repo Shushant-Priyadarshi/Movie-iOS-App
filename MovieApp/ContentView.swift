@@ -15,11 +15,11 @@ struct ContentView: View {
             }
             
             Tab(Constants.upcomingString,systemImage: Constants.upcomingIconString){
-                Text(Constants.upcomingString)
+                UpcomingMovieView()
             }
             
             Tab(Constants.searchString,systemImage: Constants.searchIconString){
-                Text(Constants.searchString)
+                SearchView(movies: MovieModel.previewMovies)
             }
             
             Tab(Constants.downloadsString,systemImage: Constants.downloadIconString){

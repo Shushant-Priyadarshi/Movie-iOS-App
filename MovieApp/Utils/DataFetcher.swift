@@ -16,6 +16,7 @@ struct DataFetcher{
     
     //https://api.themoviedb.org/3/trending/movie/day?api_key=YOUR_API_KEY //for trending movies
     //https://api.themoviedb.org/3/movie/top_rated?api_key=YOUR_API_KEY    //for top rated movies
+    //https://api.themoviedb.org/3/movie/upcoming?api_key=YOUR_API_KEY     //for upcoming movies
     func fetchMovies(for media: String, by type:String) async throws -> [MovieModel]{
         
         guard let fetchURL =  try buildURL(media: media, type: type) else{
@@ -26,9 +27,6 @@ struct DataFetcher{
         Constants.addPostPath(to: &movies)
         return movies
     }
-    
-    
-    
     
     //function to build url for trending movie / top rated movie  and trending tv / top rated tv
     //media could be movie or tv
@@ -44,9 +42,9 @@ struct DataFetcher{
         var path:String
         
         if type == "trending"{
-            path = "3/trending/\(media)/day"
-        }else if type == "top_rated"{
-            path = "3/\(media)/top_rated"
+            path = "3/\(type)/\(media)/day"
+        }else if type == "top_rated" || type == "upcoming"{
+            path = "3/\(media)/\(type)"
         }else{
             throw NetworkError.urlBuildFailed
         }
@@ -64,7 +62,7 @@ struct DataFetcher{
     }
     
     
-    //fetch trailer of the movie provided
+    //fetch trailer url of the movie provided from youtube
     func fetchVideoId(for movie:String) async throws -> String {
         guard let baseSearchURL  = youtubeSearchURL else{
             throw NetworkError.missingConfig
