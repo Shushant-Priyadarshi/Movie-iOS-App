@@ -40,6 +40,21 @@ struct MovieDetailView: View {
                         
                         Text(MovieDetailData.overview ?? "")
                             .padding(5)
+                        
+                        
+                        HStack{
+                            Spacer()
+                            
+                            Button {
+                                
+                            } label: {
+                                Text(Constants.downloadsString)
+                                    .myBtnStyle()
+                            }
+
+                            
+                            Spacer()
+                        }
                     }
                 }
             case .failed(let underlyingError):

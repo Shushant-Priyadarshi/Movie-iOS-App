@@ -17,9 +17,10 @@ struct DataFetcher{
     //https://api.themoviedb.org/3/trending/movie/day?api_key=YOUR_API_KEY //for trending movies
     //https://api.themoviedb.org/3/movie/top_rated?api_key=YOUR_API_KEY    //for top rated movies
     //https://api.themoviedb.org/3/movie/upcoming?api_key=YOUR_API_KEY     //for upcoming movies
-    func fetchMovies(for media: String, by type:String) async throws -> [MovieModel]{
+    //https://api.themoviedb.org/3/search/movie?api_key=YOUR_API_KEY&query=MOVIE_NAME //for searching the movies
+    func fetchMovies(for media: String, by type:String, with searchedMovieOrTV:String? = nil) async throws -> [MovieModel]{
         
-        guard let fetchURL =  try buildURL(media: media, type: type) else{
+        guard let fetchURL =  try buildURL(media: media, type: type, searchPhrase: searchedMovieOrTV) else{
             throw NetworkError.urlBuildFailed
         }
         
@@ -30,7 +31,7 @@ struct DataFetcher{
     
     //function to build url for trending movie / top rated movie  and trending tv / top rated tv
     //media could be movie or tv
-    private func buildURL(media:String,type:String) throws -> URL?{
+    private func buildURL(media:String, type:String, searchPhrase:String? = nil) throws -> URL?{
         guard let baseURL = tmdbBaseURL else{
             throw NetworkError.missingConfig
         }
@@ -45,15 +46,23 @@ struct DataFetcher{
             path = "3/\(type)/\(media)/day"
         }else if type == "top_rated" || type == "upcoming"{
             path = "3/\(media)/\(type)"
+        }else if type == "search"{
+            path = "3/\(type)/\(media)"
         }else{
             throw NetworkError.urlBuildFailed
         }
         
+        var urlQueryItems = [
+            URLQueryItem(name: "api_key", value: apiKey)
+        ]
+        
+        if let searchPhrase{
+            urlQueryItems.append(URLQueryItem(name: "query", value: searchPhrase))
+        }
+        
         guard let url = URL(string: baseURL)?
             .appending(path: path)
-            .appending(queryItems: [
-                URLQueryItem(name: "api_key", value: apiKey)
-            ])
+            .appending(queryItems: urlQueryItems)
         else{
             throw NetworkError.urlBuildFailed
         }

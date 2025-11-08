@@ -19,7 +19,7 @@ struct ContentView: View {
             }
             
             Tab(Constants.searchString,systemImage: Constants.searchIconString){
-                SearchView(movies: MovieModel.previewMovies)
+                SearchView()
             }
             
             Tab(Constants.downloadsString,systemImage: Constants.downloadIconString){
