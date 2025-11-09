@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct UpcomingMovieView: View {
-    @State private var moviePath = NavigationPath()
     var movieViewModel = MovieViewModel()
     
     var body: some View {
-        NavigationStack(path: $moviePath) {
+        NavigationStack{
             GeometryReader{geo in
                 switch movieViewModel.upcomingStatus {
                 case .notStarted:
@@ -21,19 +20,17 @@ struct UpcomingMovieView: View {
                     ProgressView()
                         .frame(width: geo.size.width, height: geo.size.height)
                 case .success:
-                    VerticalListView(movies: movieViewModel.upcomingMovies){ movie in
-                        moviePath.append(movie)
-                    }
+                    VerticalListView(movies: movieViewModel.upcomingMovies,canDelete: false)
                 case .failed(let error):
                     Text("error: \(error.localizedDescription)")
+                        .errorMessageStyle()
+                        .frame(width: geo.size.width, height: geo.size.height)
                 }
             }
             .task {
                 await movieViewModel.getUpcomingMovies()
             }
-            .navigationDestination(for: MovieModel.self) { movie in
-                MovieDetailView(MovieDetailData: movie)
-            }
+
         }
     }
     

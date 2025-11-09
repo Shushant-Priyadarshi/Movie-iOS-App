@@ -6,14 +6,16 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MovieDetailView: View {
     let MovieDetailData:MovieModel
     var titleName:String{
         return (MovieDetailData.name ?? MovieDetailData.title) ?? ""
     }
-    
     let movieViewModel = MovieViewModel()
+    @Environment(\.modelContext) var modelContext
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         GeometryReader{ geo in
@@ -46,7 +48,11 @@ struct MovieDetailView: View {
                             Spacer()
                             
                             Button {
-                                
+                                let saveMovieOrTv = MovieDetailData
+                                saveMovieOrTv.title = titleName
+                                modelContext.insert(saveMovieOrTv)
+                                try? modelContext.save()
+                                dismiss()
                             } label: {
                                 Text(Constants.downloadsString)
                                     .myBtnStyle()
@@ -59,6 +65,8 @@ struct MovieDetailView: View {
                 }
             case .failed(let underlyingError):
                 Text(underlyingError.localizedDescription)
+                    .errorMessageStyle()
+                    .frame(width: geo.size.width, height: geo.size.height)
             }
         }
         .task {

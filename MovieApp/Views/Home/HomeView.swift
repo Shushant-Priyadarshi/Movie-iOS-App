@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct HomeView: View {
     var movieViewModel = MovieViewModel()
     @State private var movieDetailPath = NavigationPath()
+    @Environment(\.modelContext) var modelContext
     
     var body: some View {
         NavigationStack(path: $movieDetailPath) {
@@ -54,7 +56,8 @@ struct HomeView: View {
                                 
                                 
                                 Button{
-                                    
+                                    modelContext.insert(movieViewModel.heroMovie)
+                                    try? modelContext.save()
                                 }label: {
                                     Text(Constants.downloadsString)
                                         .myBtnStyle()
@@ -77,7 +80,9 @@ struct HomeView: View {
                        
                         
                     case .failed(let error):
-                        Text("Error \(error.localizedDescription)")
+                        Text(error.localizedDescription)
+                            .errorMessageStyle()
+                            .frame(width: geo.size.width, height: geo.size.height)
                         
                     }
                     

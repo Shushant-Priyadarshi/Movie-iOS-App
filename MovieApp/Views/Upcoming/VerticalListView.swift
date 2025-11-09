@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct VerticalListView: View {
     var movies:[MovieModel]
-    let onSelect: (MovieModel) -> Void
+    let canDelete:Bool
+    @Environment(\.modelContext) var modelContext
     
     var body: some View {
         List(movies){ movie in
@@ -33,9 +35,16 @@ struct VerticalListView: View {
                     ProgressView()
                 }
                 .frame(height: 150)
-                .onTapGesture {
-                    onSelect(movie)
+            }
+            .swipeActions(edge: .trailing) {
+                Button {
+                    modelContext.delete(movie)
+                    try? modelContext.save()
+                } label: {
+                    Image(systemName: "trash")
+                        .tint(.red)
                 }
+
             }
       
             
@@ -44,5 +53,5 @@ struct VerticalListView: View {
 }
 
 #Preview {
-    VerticalListView(movies: MovieModel.previewMovies){_ in}
+    VerticalListView(movies: MovieModel.previewMovies, canDelete: true)
 }
